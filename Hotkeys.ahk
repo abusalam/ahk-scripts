@@ -1,5 +1,8 @@
 ﻿#Requires AutoHotkey v2.0
 
+#Include ".env.example"
+#Include "*i .env"
+
 global OutputVarWin := WinExist("A")
 
 ; Names for the tray menu items:
@@ -22,13 +25,14 @@ MenuHandler(Item, *) {
 ^+c::CopyMouseCoords ;Ctrl + Shift + c
 ^+t::ToggleOnTop ;Ctrl+Shift+T
 
-TestingAHK(){
-
+TestingAHK() {
+	ClickOnScreen(WebinarPlayButton)
+	TrayTip TestVarFromEnv?, "AoT Window", "Mute"
 }
 
 ToggleOnTop(*){
-	CoordMode "Mouse", "Screen"
-	MouseGetPos &OutputVarX, &OutputVarY, &OutputVarWin
+	; CoordMode "Mouse", "Screen"
+	; MouseGetPos &OutputVarX, &OutputVarY, &OutputVarWin
 	Try {
 		WinSetAlwaysOnTop(-1, OutputVarWin)
 		TrayTip OutputVarWin, WinGetTitle(OutputVarWin), "Mute"
@@ -70,7 +74,7 @@ CopyMenuName(Item, *) {
 
 CheckWebinar(*) {
 
-	CheckInterval := IsInteger(A_Clipboard) ? (Integer(A_Clipboard) * 1000) : 120000 ; Time in milliseconds
+	CheckInterval := IsInteger(A_Clipboard) ? (Integer(A_Clipboard) * 1000) : WebinarCheckInterval ; Time in miliseconds
 	WebinarTime := 810 ; 810 Minutes means 13:30 PM
 
 	static TimerStarted := false
@@ -79,7 +83,7 @@ CheckWebinar(*) {
 	if(RemainingTime <= 0) {
 		if(TimerStarted) {
 			TrayTip "Started!", "NIC Webinar", "Mute"
-			ClickOnScreen(-1525, 2591)
+			ClickOnScreen(WebinarFullscreenButton) ; Webinar Fullscreen Button
 			SetTimer , 0  ; i.e. the timer turns itself off here.
 		}
 		TrayTip "Ended!", "NIC Webinar", "Mute"
@@ -88,7 +92,7 @@ CheckWebinar(*) {
 		SetTimer CheckWebinar, CheckInterval
 		TimerStarted := true
 	}
-	if(A_TimeIdle > 30000) {
+	if(A_TimeIdle > IdleWaitTime) {
 		TrayTip RemainingTime " minutes remaining to start", "NIC Webinar", "Mute"
 		RefreshWebinar
 	}
@@ -111,14 +115,14 @@ CopyContent(MenuItem, *) {
 }
 
 RefreshWebinar() {
-	ClickOnScreen(-2053, 1958) ; Browser Refresh Button
-	Sleep 6000
-	ClickOnScreen(-1807, 2390) ; Play Webinar Button
+	ClickOnScreen(WebinarBrowserRefreshButton) ; Browser Refresh Button
+	Sleep WaitForBrowserRefresh
+	ClickOnScreen(WebinarPlayButton) ; Play Webinar Button
 }
 
-ClickOnScreen(X, Y) {
+ClickOnScreen(coord) {
 	CoordMode "Mouse", "Screen"
-	DllCall("SetCursorPos", "int", X, "int", Y)
+	DllCall("SetCursorPos", "int", coord[1], "int", coord[2])
 	Sleep 100
 	Click
 }
