@@ -1,6 +1,6 @@
 ﻿#Requires AutoHotkey v2.0
 
-OutputVarWin := WinExist("A")
+global OutputVarWin := WinExist("A")
 
 ; Names for the tray menu items:
 k_MenuItemWebinar := "CheckWebinar (Ctrl+Shift+H)"
@@ -43,6 +43,7 @@ ShowCoords(){
 	Coords := xpos ", " ypos
 	c_Menu := Menu()
 	c_Menu.Add(Coords, CopyMenuName)
+	c_Menu.Add(WinGetTitle(OutputVarWin), CopyMenuName)
 	c_Menu.Add()
 	c_Menu.Add(k_MenuItemToggleOnTop, ToggleOnTop)
 	c_Menu.Add(k_MenuItemWebinar, CheckWebinar)
@@ -69,7 +70,7 @@ CopyMenuName(Item, *) {
 
 CheckWebinar(*) {
 
-	CheckInterval := 50000 ; Time in milliseconds
+	CheckInterval := IsInteger(A_Clipboard) ? (Integer(A_Clipboard) * 1000) : 120000 ; Time in milliseconds
 	WebinarTime := 810 ; 810 Minutes means 13:30 PM
 
 	static TimerStarted := false
@@ -87,8 +88,12 @@ CheckWebinar(*) {
 		SetTimer CheckWebinar, CheckInterval
 		TimerStarted := true
 	}
-	TrayTip RemainingTime " minutes remaining to start", "NIC Webinar", "Mute"
-	RefreshWebinar
+	if(A_TimeIdle > 30000) {
+		TrayTip RemainingTime " minutes remaining to start", "NIC Webinar", "Mute"
+		RefreshWebinar
+	}
+	ToolTip "Checking again in " CheckInterval " ms."
+	SetTimer () => ToolTip(), -5000
 }
 
 CopyMouseCoords(*) {
