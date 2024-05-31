@@ -7,9 +7,9 @@ OutputVarWin := WinExist("A")
 AoT_Windows := Map()
 
 ; Names for the tray menu items:
-k_MenuItemWebinar := "CheckWebinar (Ctrl+Shift+H)"
-k_MenuItemCopyCoords := "CopyMouseCoords (Ctrl+Shift+C)"
-k_MenuItemToggleOnTop := "AlwaysOnTop (Ctrl+Shift+T)"
+k_MenuItemToggleOnTop := "&Always On Top`tCtrl+Shift+T"
+k_MenuItemWebinar :=     "Check &Webinar`tCtrl+Shift+H"
+k_MenuItemCopyCoords :=  "Copy &Coords`tCtrl+Shift+C"
 s_MenuItemOpen := "&Open"
 
 ; Create the popup menu by adding some items to it.
